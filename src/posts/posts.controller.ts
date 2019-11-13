@@ -2,6 +2,9 @@ import * as express from 'express';
 import Controller from '../interfaces/controller.interface';
 import Post from './post.interface';
 import postModel from './posts.model';
+import PostNotFoundException from '../exceptions/PostNotFoundException';
+import CreatePostDto from './post.dto';
+import validationMiddleware from '../middleware/validation.middleware';
 
 class PostsController implements Controller {
     public path = '/posts';
@@ -15,9 +18,9 @@ class PostsController implements Controller {
     private initializeRoutes() {
         this.router.get(this.path, this.getAllPosts);
         this.router.get(`${this.path}/:id`, this.getPostById);
-        this.router.put(`${this.path}/:id`, this.modifyPost);
+        this.router.put(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
         this.router.delete(`${this.path}/:id`, this.deletePost);
-        this.router.post(this.path, this.createPost);
+        this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
     }
 
     private getAllPosts = (request: express.Request, response: express.Response) => {
@@ -27,11 +30,17 @@ class PostsController implements Controller {
             });
     };
 
-    private getPostById = (request: express.Request, response: express.Response) => {
+    private getPostById = (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const id = request.params.id;
         this.post.findById(id)
             .then((post) => {
-                response.send(post);
+                if (post) {
+                    console.log('[obabichev] halllo1', 123);
+                    response.send(post);
+                }
+            })
+            .catch(err => {
+                next(new PostNotFoundException(id));
             });
     };
 
