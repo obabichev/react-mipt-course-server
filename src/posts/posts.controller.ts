@@ -39,7 +39,6 @@ class PostsController implements Controller {
         this.post.findById(id)
             .then((post) => {
                 if (post) {
-                    console.log('[obabichev] halllo1', 123);
                     response.send(post);
                 }
             })

@@ -8,14 +8,11 @@ import userModel from '../user/user.model';
 
 async function authMiddleware(request: RequestWithUser, response: Response, next: NextFunction) {
     const cookies = request.cookies;
-    console.log('[obabichev] cookies', cookies);
     if (cookies && cookies.Authorization) {
         const secret = process.env.JWT_SECRET;
-        console.log('[obabichev] secret', secret);
         try {
             const verificationResponse = jwt.verify(cookies.Authorization, secret) as DataStoredInToken;
             const id = verificationResponse._id;
-            console.log('[obabichev] id', id);
             const user = await userModel.findById(id);
             if (user) {
                 request.user = user;
