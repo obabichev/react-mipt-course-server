@@ -11,16 +11,18 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^12.12.7",
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
+    "class-transformer": "latest",
     "class-validator": "^0.11.0",
     "envalid": "^5.0.0",
     "express": "^4.17.1",
     "mongoose": "^5.7.10",
     "ts-node": "^8.4.1",
-    "typescript": "^3.7.2",
-    "class-transformer": "latest"
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.2"
   }
 }
