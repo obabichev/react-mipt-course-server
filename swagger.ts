@@ -14,15 +14,15 @@ const options = {
         basePath: '/',
         components: {
             securitySchemes: {
-                cookieAuth: {
-                    type: 'apiKey',
-                    in: 'cookie',
-                    name: 'Authorization'
+                bearer: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
                 }
             }
         },
         security: [{
-            cookieAuth: []
+            bearer: []
         }]
     },
     apis: ['src/**/*.ts']

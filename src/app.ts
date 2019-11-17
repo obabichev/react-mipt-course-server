@@ -5,20 +5,27 @@ import Controller from './interfaces/controller.interface';
 import errorMiddleware from './middleware/error.middleware';
 import * as cookieParser from 'cookie-parser';
 import {swaggerConnect} from '../swagger';
+import * as helmet from "helmet";
+import * as cors from "cors";
 
 
 class App {
     public app: express.Application;
 
     constructor(controllers: Controller[]) {
-        this.app = express();
+        const app = express();
+        this.app = app;
 
-        swaggerConnect(this.app, '/swagger');
+        app.use(cors());
+        app.use(helmet());
+
+        swaggerConnect(app, '/swagger');
 
         App.connectToTheDatabase();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
         this.initializeErrorHandling();
+
     }
 
     public listen() {

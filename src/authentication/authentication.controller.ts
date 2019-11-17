@@ -58,8 +58,6 @@ class AuthenticationController implements Controller {
         this.router.post(`${this.path}/logout`, this.loggingOut);
     }
 
-    // Authorization
-
     private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const userData: CreateUserDto = request.body;
         try {
@@ -82,8 +80,7 @@ class AuthenticationController implements Controller {
             if (isPasswordMatching) {
                 user.password = undefined;
                 const tokenData = this.createToken(user);
-                response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
-                response.send(user);
+                response.send(tokenData);
             } else {
                 next(new WrongCredentialsException());
             }
@@ -96,10 +93,6 @@ class AuthenticationController implements Controller {
         response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
         response.send(200);
     };
-
-    private createCookie(tokenData: TokenData) {
-        return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
-    }
 
     private createToken(user: User): TokenData {
         const expiresIn = 60 * 60; // an hour
