@@ -7,9 +7,9 @@ const options = {
     swaggerDefinition: {
         openapi: '3.0.1',
         info: {
-            title: 'test',
+            title: 'Mini Jira',
             version: '1.0.0',
-            description: 'Hallo again'
+            description: 'Final project of the MIPT React course'
         },
         basePath: '/',
         components: {
