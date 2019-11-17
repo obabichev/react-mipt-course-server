@@ -42,17 +42,44 @@ class AuthenticationController implements Controller {
          *         application/json:
          *           schema:
          *             $ref: '#/definitions/LoginRequest'
+         *           example: {
+         *                 "email": "",
+         *                 "password": ""
+         *             }
          *     security: []
          *     responses:
          *       '200':
          *         description: >
          *           Successfully authenticated.
-         *           The session ID is returned in a cookie named `Authorization`. You need to include this cookie in subsequent requests.
-         *         headers:
-         *           Set-Cookie:
+         *         content:
+         *           application/json:
          *             schema:
-         *               type: string
-         *               example: Authorization=abcde12345; Path=/; HttpOnly
+         *               type: object
+         *               properties:
+         *                 token:
+         *                   type: string
+         *                 expiresIn:
+         *                   type: number
+         *             example: {
+         *                 token: "",
+         *                 expiresIn: 3600
+         *             }
+         *       '401':
+         *         description: >
+         *           Wrong credentials provided
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 status:
+         *                   type: string
+         *                 message:
+         *                   type: string
+         *             example: {
+         *                 status: "401",
+         *                 message: "Wrong credentials provided"
+         *             }
          */
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
         this.router.post(`${this.path}/logout`, this.loggingOut);
