@@ -2,13 +2,16 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "es2017",
+    "module": "commonjs",
     "outDir": "./dist",
     "baseUrl": "./src",
     "experimentalDecorators": true,
     "moduleResolution": "node"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "server.ts",
+    "swagger.ts"
   ],
   "exclude": [
     "node_modules"

@@ -10,7 +10,7 @@
     "serve": "node dist/server.js",
     "watch-node": "nodemon dist/server.js",
     "watch-ts": "tsc -w",
-    "dev": "ts-node ./src/server.ts"
+    "dev": "ts-node server.ts"
   },
   "author": "",
   "license": "ISC",
