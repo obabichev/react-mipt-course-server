@@ -3,13 +3,27 @@ import * as swaggerJsdoc from 'swagger-jsdoc';
 import * as express from 'express';
 
 const options = {
+    "openapi": "3.0.0",
     swaggerDefinition: {
+        openapi: '3.0.1',
         info: {
             title: 'test',
             version: '1.0.0',
-            description: 'Hallo'
+            description: 'Hallo again'
         },
-        basePath: '/'
+        basePath: '/',
+        components: {
+            securitySchemes: {
+                cookieAuth: {
+                    type: 'apiKey',
+                    in: 'cookie',
+                    name: 'Authorization'
+                }
+            }
+        },
+        security: [{
+            cookieAuth: []
+        }]
     },
     apis: ['src/**/*.ts']
 };
