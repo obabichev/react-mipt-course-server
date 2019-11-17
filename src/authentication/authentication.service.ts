@@ -22,16 +22,11 @@ class AuthenticationService {
             password: hashedPassword,
         });
         user.password = undefined;
-        const tokenData = this.createToken(user);
-        const cookie = this.createCookie(tokenData);
+        const token = this.createToken(user);
         return {
-            cookie,
+            token,
             user,
         };
-    }
-
-    public createCookie(tokenData: TokenData) {
-        return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
     }
 
     public createToken(user: User): TokenData {

@@ -25,16 +25,51 @@ class AuthenticationController implements Controller {
     private initializeRoutes() {
         /**
          * @swagger
-         * /register:
+         * /auth/register:
          *   post:
-         *     description: Create new account
+         *     summary: Create new User
+         *     requestBody:
+         *       required: true
+         *       description: A JSON object containing the name, email and password.
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/definitions/CreateUser'
+         *           example: {
+         *                 "name": "",
+         *                 "email": "",
+         *                 "password": ""
+         *             }
+         *     security: []
+         *     responses:
+         *       '200':
+         *         description: >
+         *           User created successfully.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 token:
+         *                   type: object
+         *                   properties:
+         *                     token:
+         *                       type: string
+         *                     expiresIn:
+         *                       type: number
+         *             example: {
+         *                 token: {
+         *                     token: "",
+         *                     expiresIn: ""
+         *                 },
+         *             }
          */
         this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
         /**
          * @swagger
          * /auth/login:
          *   post:
-         *     summary: Logs in and returns the authentication cookie
+         *     summary: Log in and return auth token
          *     requestBody:
          *       required: true
          *       description: A JSON object containing the login and password.
@@ -57,12 +92,17 @@ class AuthenticationController implements Controller {
          *               type: object
          *               properties:
          *                 token:
-         *                   type: string
-         *                 expiresIn:
-         *                   type: number
+         *                   type: object
+         *                   properties:
+         *                     token:
+         *                       type: string
+         *                     expiresIn:
+         *                       type: number
          *             example: {
-         *                 token: "",
-         *                 expiresIn: 3600
+         *                 token: {
+         *                     token: "",
+         *                     expiresIn: ""
+         *                 },
          *             }
          *       '401':
          *         description: >
@@ -89,11 +129,13 @@ class AuthenticationController implements Controller {
         const userData: CreateUserDto = request.body;
         try {
             const {
-                cookie,
+                token,
                 user,
             } = await this.authenticationService.register(userData);
-            response.setHeader('Set-Cookie', [cookie]);
-            response.send(user);
+            response.send({
+                token,
+                user
+            });
         } catch (error) {
             next(error);
         }
@@ -106,8 +148,11 @@ class AuthenticationController implements Controller {
             const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
             if (isPasswordMatching) {
                 user.password = undefined;
-                const tokenData = this.createToken(user);
-                response.send(tokenData);
+                const token = this.createToken(user);
+                response.send({
+                    token,
+                    user
+                });
             } else {
                 next(new WrongCredentialsException());
             }

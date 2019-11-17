@@ -24,23 +24,6 @@ class PostsController implements Controller {
             .all(`${this.path}/*`, authMiddleware)
             .put(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
             .delete(`${this.path}/:id`, this.deletePost)
-            /**
-             * @swagger
-             * /posts:
-             *   post:
-             *     description: Create new Post
-             *     produces:
-             *       - application/json
-             *     parameters:
-             *       - schema:
-             *           $ref: '#/definitions/Post'
-             *     requestBody:
-             *       required: true
-             *       content:
-             *         application/json:
-             *           schema:
-             *             $ref: '#/definitions/Post'
-             */
             .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
     }
 

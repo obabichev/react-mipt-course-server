@@ -7,9 +7,9 @@ import {IsString} from 'class-validator';
  *     type: object
  *     properties:
  *       email:
- *         type; string
+ *         type: string
  *       password:
- *         type; string
+ *         type: string
  */
 class LogInDto {
     @IsString()
