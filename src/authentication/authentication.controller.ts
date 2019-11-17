@@ -23,6 +23,12 @@ class AuthenticationController implements Controller {
     }
 
     private initializeRoutes() {
+        /**
+         * @swagger
+         * /register:
+         *   post:
+         *     description: Create new account
+         */
         this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
         this.router.post(`${this.path}/logout`, this.loggingOut);

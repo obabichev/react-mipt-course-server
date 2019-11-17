@@ -4,6 +4,7 @@ import * as mongoose from 'mongoose';
 import Controller from './interfaces/controller.interface';
 import errorMiddleware from './middleware/error.middleware';
 import * as cookieParser from 'cookie-parser';
+import {swaggerConnect} from '../swagger';
 
 
 class App {
@@ -12,7 +13,9 @@ class App {
     constructor(controllers: Controller[]) {
         this.app = express();
 
-        this.connectToTheDatabase();
+        swaggerConnect(this.app, '/swagger');
+
+        App.connectToTheDatabase();
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
         this.initializeErrorHandling();
@@ -39,7 +42,7 @@ class App {
         });
     }
 
-    private connectToTheDatabase() {
+    private static connectToTheDatabase() {
         const {
             MONGO_USER,
             MONGO_PASSWORD,
