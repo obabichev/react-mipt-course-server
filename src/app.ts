@@ -50,12 +50,19 @@ class App {
     }
 
     private static connectToTheDatabase() {
-        const {
-            MONGO_USER,
-            MONGO_PASSWORD,
-            MONGO_PATH,
-        } = process.env;
-        mongoose.connect(`mongodb://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`, {
+        let uri = '';
+        if (process.env.MONGODB_URI) {
+            uri = process.env.MONGODB_URI;
+        } else {
+            const {
+                MONGO_USER,
+                MONGO_PASSWORD,
+                MONGO_PATH,
+            } = process.env;
+            uri = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`;
+        }
+
+        mongoose.connect(uri, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
