@@ -4,3 +4,5 @@ class CreateBoardDto {
     @IsString()
     public title: string;
 }
+
+export default CreateBoardDto;
