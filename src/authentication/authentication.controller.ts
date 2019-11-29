@@ -1,16 +1,14 @@
 import * as bcrypt from 'bcrypt';
 import * as express from 'express';
-import * as jwt from 'jsonwebtoken';
 import WrongCredentialsException from '../exceptions/WrongCredentialsException';
 import Controller from '../interfaces/controller.interface';
-import DataStoredInToken from '../interfaces/dataStoredInToken';
-import TokenData from '../interfaces/tokenData.interface';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../user/user.dto';
-import User from '../user/user.interface';
 import userModel from './../user/user.model';
 import AuthenticationService from './authentication.service';
 import LogInDto from './logIn.dto';
+import GoogleAuthDto from './googleAuth.dto';
+import {getGoogleAccountFromCode} from '../../utils/google';
 
 class AuthenticationController implements Controller {
     public path = '/auth';
@@ -123,6 +121,7 @@ class AuthenticationController implements Controller {
          */
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
         this.router.post(`${this.path}/logout`, this.loggingOut);
+        this.router.post(`${this.path}/google`, validationMiddleware(GoogleAuthDto), this.googleAuth)
     }
 
     private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -148,7 +147,7 @@ class AuthenticationController implements Controller {
             const isPasswordMatching = await bcrypt.compare(logInData.password, user.password);
             if (isPasswordMatching) {
                 user.password = undefined;
-                const token = this.createToken(user);
+                const token = this.authenticationService.createToken(user);
                 response.send({
                     token,
                     user
@@ -166,18 +165,19 @@ class AuthenticationController implements Controller {
         response.send(200);
     };
 
-    private createToken(user: User): TokenData {
-        const expiresIn = 60 * 60; // an hour
-        const secret = process.env.JWT_SECRET;
-        const dataStoredInToken: DataStoredInToken = {
-            _id: user._id,
-        };
-        return {
-            expiresIn,
-            token: jwt.sign(dataStoredInToken, secret, {expiresIn}),
-        };
-    }
+    private googleAuth = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            const code = request.body.code;
 
+            const user = await getGoogleAccountFromCode(code);
+
+            const result = await this.authenticationService.oauthLoginOrRegistration(user, 'google');
+
+            response.send(result);
+        } catch (e) {
+            next(e)
+        }
+    }
 }
 
 export default AuthenticationController;

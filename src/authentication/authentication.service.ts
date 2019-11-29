@@ -6,6 +6,8 @@ import TokenData from '../interfaces/tokenData.interface';
 import CreateUserDto from '../user/user.dto';
 import User from '../user/user.interface';
 import userModel from './../user/user.model';
+import UserWasAlreadyRegisteredWithOtherServiceException
+    from '../exceptions/UserWasAlreadyRegisteredWithOtherServiceException';
 
 class AuthenticationService {
     public user = userModel;
@@ -38,6 +40,27 @@ class AuthenticationService {
         return {
             expiresIn,
             token: jwt.sign(dataStoredInToken, secret, {expiresIn}),
+        };
+    }
+
+    public async oauthLoginOrRegistration(user: { name: string, email: string }, service: 'google') {
+        const dbUser = await this.user.findOne({email: user.email});
+        if (dbUser && dbUser.oauth === service) {
+            return dbUser;
+        }
+        if (dbUser && dbUser.oauth !== service) {
+            throw new UserWasAlreadyRegisteredWithOtherServiceException();
+        }
+
+        const newUser = await this.user.create({
+            name: user.name,
+            email: user.email,
+            oauth: service
+        });
+        const token = this.createToken(newUser);
+        return {
+            token,
+            user: newUser,
         };
     }
 }

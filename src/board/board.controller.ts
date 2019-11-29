@@ -29,6 +29,60 @@ class BoardController implements Controller {
         response.send(boards);
     };
 
+    /**
+     * @swagger
+     * /board:
+     *   post:
+     *     summary: Create new Board
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/definitions/LoginRequest'
+     *           example: {
+     *                 "title": "",
+     *             }
+     *     security: []
+     *     responses:
+     *       '200':
+     *         description: >
+     *           Successfully authenticated.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 token:
+     *                   type: object
+     *                   properties:
+     *                     token:
+     *                       type: string
+     *                     expiresIn:
+     *                       type: number
+     *             example: {
+     *                 token: {
+     *                     token: "",
+     *                     expiresIn: ""
+     *                 },
+     *             }
+     *       '401':
+     *         description: >
+     *           Wrong credentials provided
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 status:
+     *                   type: string
+     *                 message:
+     *                   type: string
+     *             example: {
+     *                 status: "401",
+     *                 message: "Wrong credentials provided"
+     *             }
+     */
     createBoard = async (request: RequestWithUser, response: express.Response) => {
         const boardData: CreateBoardDto = request.body;
 
