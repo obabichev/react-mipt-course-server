@@ -6,9 +6,11 @@ import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../user/user.dto';
 import userModel from './../user/user.model';
 import AuthenticationService from './authentication.service';
-import LogInDto from './logIn.dto';
-import GoogleAuthDto from './googleAuth.dto';
 import {getGoogleAccountFromCode} from '../../utils/google';
+import {GoogleAuthDto, LogInDto, UpdateTokensDto} from './authentication.dto';
+import * as jwt from 'jsonwebtoken';
+import DataStoredInToken from '../interfaces/dataStoredInToken';
+import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
 
 class AuthenticationController implements Controller {
     public path = '/auth';
@@ -121,7 +123,8 @@ class AuthenticationController implements Controller {
          */
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
         this.router.post(`${this.path}/logout`, this.loggingOut);
-        this.router.post(`${this.path}/google`, validationMiddleware(GoogleAuthDto), this.googleAuth)
+        this.router.post(`${this.path}/google`, validationMiddleware(GoogleAuthDto), this.googleAuth);
+        this.router.post(`${this.path}/update-tokens`, validationMiddleware(UpdateTokensDto), this.updateTokens);
     }
 
     private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -173,9 +176,28 @@ class AuthenticationController implements Controller {
 
             const result = await this.authenticationService.oauthLoginOrRegistration(user, 'google');
 
+            console.log('[obabichev] result', result);
+
             response.send(result);
         } catch (e) {
             next(e)
+        }
+    };
+
+    private updateTokens = (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        const refreshToken = request.body.refreshToken;
+
+        const secret = process.env.JWT_REFRESH_SECRET;
+
+        try {
+            const verificationResponse = jwt.verify(refreshToken, secret) as DataStoredInToken;
+            const _id = verificationResponse._id;
+
+            const tokens = this.authenticationService.createToken({_id});
+
+            response.send(tokens);
+        } catch (error) {
+            next(new WrongAuthenticationTokenException());
         }
     }
 }

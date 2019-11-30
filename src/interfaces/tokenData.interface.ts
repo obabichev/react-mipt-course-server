@@ -1,6 +1,9 @@
 interface TokenData {
-    token: string;
-    expiresIn: number;
+    accessToken: string;
+    accessTokenExpiresIn: number;
+    refreshToken: string,
+    refreshTokenExpiresIn: number,
+
 }
 
 export default TokenData;

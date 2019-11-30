@@ -4,7 +4,6 @@ import UserWithThatEmailAlreadyExistsException from '../exceptions/UserWithThatE
 import DataStoredInToken from '../interfaces/dataStoredInToken';
 import TokenData from '../interfaces/tokenData.interface';
 import CreateUserDto from '../user/user.dto';
-import User from '../user/user.interface';
 import userModel from './../user/user.model';
 import UserWasAlreadyRegisteredWithOtherServiceException
     from '../exceptions/UserWasAlreadyRegisteredWithOtherServiceException';
@@ -31,22 +30,32 @@ class AuthenticationService {
         };
     }
 
-    public createToken(user: User): TokenData {
-        const expiresIn = 60 * 60; // an hour
+    public createToken(user: { _id: string }): TokenData {
+        const accessTokenExpiresIn = 60 * 60; // an hour
+        const refreshTokenExpiresIn = 60 * 60 * 24 * 30 * 6; // about half year
         const secret = process.env.JWT_SECRET;
+        const refreshSecret = process.env.JWT_REFRESH_SECRET;
+
         const dataStoredInToken: DataStoredInToken = {
             _id: user._id,
         };
+
         return {
-            expiresIn,
-            token: jwt.sign(dataStoredInToken, secret, {expiresIn}),
+            accessToken: jwt.sign(dataStoredInToken, secret, {expiresIn: accessTokenExpiresIn}),
+            accessTokenExpiresIn,
+            refreshToken: jwt.sign(dataStoredInToken, refreshSecret, {expiresIn: refreshTokenExpiresIn}),
+            refreshTokenExpiresIn
         };
     }
 
     public async oauthLoginOrRegistration(user: { name: string, email: string }, service: 'google') {
         const dbUser = await this.user.findOne({email: user.email});
         if (dbUser && dbUser.oauth === service) {
-            return dbUser;
+            const token = this.createToken(dbUser);
+            return {
+                token,
+                user: dbUser
+            };
         }
         if (dbUser && dbUser.oauth !== service) {
             throw new UserWasAlreadyRegisteredWithOtherServiceException();
