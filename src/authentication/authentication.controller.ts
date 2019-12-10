@@ -6,11 +6,11 @@ import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../user/user.dto';
 import userModel from './../user/user.model';
 import AuthenticationService from './authentication.service';
-import {getGoogleAccountFromCode} from '../../utils/google';
 import {GoogleAuthDto, LogInDto, UpdateTokensDto} from './authentication.dto';
 import * as jwt from 'jsonwebtoken';
 import DataStoredInToken from '../interfaces/dataStoredInToken';
 import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
+import {getGoogleAccountFromCode} from '../../utils/google';
 
 class AuthenticationController implements Controller {
     public path = '/auth';
@@ -170,13 +170,11 @@ class AuthenticationController implements Controller {
 
     private googleAuth = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            const code = request.body.code;
+            const idToken = request.body.id_token;
 
-            const user = await getGoogleAccountFromCode(code);
+            const user = await getGoogleAccountFromCode(idToken);
 
             const result = await this.authenticationService.oauthLoginOrRegistration(user, 'google');
-
-            console.log('[obabichev] result', result);
 
             response.send(result);
         } catch (e) {

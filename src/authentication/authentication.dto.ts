@@ -11,7 +11,7 @@ import {IsString} from 'class-validator';
  */
 export class GoogleAuthDto {
     @IsString()
-    public code: string;
+    public id_token: string;
 }
 
 /**

@@ -31,6 +31,7 @@ class AuthenticationService {
     }
 
     public createToken(user: { _id: string }): TokenData {
+        const now = Date.now();
         const accessTokenExpiresIn = 60 * 60; // an hour
         const refreshTokenExpiresIn = 60 * 60 * 24 * 30 * 6; // about half year
         const secret = process.env.JWT_SECRET;
@@ -42,9 +43,9 @@ class AuthenticationService {
 
         return {
             accessToken: jwt.sign(dataStoredInToken, secret, {expiresIn: accessTokenExpiresIn}),
-            accessTokenExpiresIn,
+            accessTokenExpiresIn: accessTokenExpiresIn + now,
             refreshToken: jwt.sign(dataStoredInToken, refreshSecret, {expiresIn: refreshTokenExpiresIn}),
-            refreshTokenExpiresIn
+            refreshTokenExpiresIn: refreshTokenExpiresIn + now
         };
     }
 
