@@ -6,7 +6,7 @@ import {IsString} from 'class-validator';
  *   GoogleAuthDto:
  *     type: object
  *     properties:
- *       code:
+ *       id_token:
  *         type: string
  */
 export class GoogleAuthDto {

@@ -11,7 +11,47 @@ import * as jwt from 'jsonwebtoken';
 import DataStoredInToken from '../interfaces/dataStoredInToken';
 import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
 import {getGoogleAccountFromCode} from '../../utils/google';
+import GoogleAuthException from '../exceptions/GoogleAuthException';
 
+/**
+ * @swagger
+ * definitions:
+ *   User:
+ *     type: object
+ *     properties:
+ *       _id:
+ *         type: string
+ *       name:
+ *         type: string
+ *       email:
+ *         type: string
+ *   Tokens:
+ *     type: object
+ *     properties:
+ *       accessToken:
+ *         type: string
+ *       accessTokenExpiresIn:
+ *         type: number
+ *       refreshToken:
+ *         type: string
+ *       refreshTokenExpiresIn:
+ *         type: number
+ *   AuthResponse:
+ *     type: object
+ *     properties:
+ *       token:
+ *         $ref: '#/definitions/Tokens'
+ *       user:
+ *         $ref: '#/definitions/User'
+ *   BadRequest:
+ *     type: object
+ *     properties:
+ *       status:
+ *         type: number
+ *       message:
+ *         type: string
+ *
+ */
 class AuthenticationController implements Controller {
     public path = '/auth';
     public router = express.Router();
@@ -48,21 +88,32 @@ class AuthenticationController implements Controller {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 token:
-         *                   type: object
-         *                   properties:
-         *                     token:
-         *                       type: string
-         *                     expiresIn:
-         *                       type: number
+         *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *                 token: {
-         *                     token: "",
-         *                     expiresIn: ""
-         *                 },
+         *               "token": {
+         *                 "accessToken": "...",
+         *                 "accessTokenExpiresIn": 1576600000000,
+         *                 "refreshToken": "...",
+         *                 "refreshTokenExpiresIn": 1576620000000
+         *               },
+         *               "user": {
+         *                 "_id": "5df91eef0f5bbb0004ba3fff",
+         *                 "name": "",
+         *                 "email": "",
+         *                 "__v": 0
+         *               }
          *             }
+         *       '400':
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/definitions/BadRequest'
+         *             example: {
+         *                 "status": 400,
+         *                 "message": "User with email already exists"
+         *             }
+         *
+         *
          */
         this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
         /**
@@ -89,20 +140,20 @@ class AuthenticationController implements Controller {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 token:
-         *                   type: object
-         *                   properties:
-         *                     token:
-         *                       type: string
-         *                     expiresIn:
-         *                       type: number
+         *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *                 token: {
-         *                     token: "",
-         *                     expiresIn: ""
-         *                 },
+         *               "token": {
+         *                 "accessToken": "...",
+         *                 "accessTokenExpiresIn": 1576600000000,
+         *                 "refreshToken": "...",
+         *                 "refreshTokenExpiresIn": 1576620000000
+         *               },
+         *               "user": {
+         *                 "_id": "5df91eef0f5bbb0004ba3fff",
+         *                 "name": "",
+         *                 "email": "",
+         *                 "__v": 0
+         *               }
          *             }
          *       '401':
          *         description: >
@@ -110,12 +161,7 @@ class AuthenticationController implements Controller {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 status:
-         *                   type: string
-         *                 message:
-         *                   type: string
+         *               $ref: '#/definitions/BadRequest'
          *             example: {
          *                 status: "401",
          *                 message: "Wrong credentials provided"
@@ -123,7 +169,103 @@ class AuthenticationController implements Controller {
          */
         this.router.post(`${this.path}/login`, validationMiddleware(LogInDto), this.loggingIn);
         this.router.post(`${this.path}/logout`, this.loggingOut);
+        /**
+         * @swagger
+         * /auth/google:
+         *   post:
+         *     summary: Login with Google id_token
+         *     requestBody:
+         *       required: true
+         *       description: A JSON object containing the id_token.
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/definitions/GoogleAuthDto'
+         *           example: {
+         *             "id_token": "..."
+         *           }
+         *     security: []
+         *     responses:
+         *       '200':
+         *         description: >
+         *           Successfully authenticated.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/definitions/AuthResponse'
+         *             example: {
+         *               "token": {
+         *                 "accessToken": "...",
+         *                 "accessTokenExpiresIn": 1576600000000,
+         *                 "refreshToken": "...",
+         *                 "refreshTokenExpiresIn": 1576620000000
+         *               },
+         *               "user": {
+         *                 "_id": "5df91eef0f5bbb0004ba3fff",
+         *                 "name": "",
+         *                 "email": "",
+         *                 "__v": 0
+         *               }
+         *             }
+         *       '400':
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/definitions/BadRequest'
+         *             example: {
+         *                 status: "400",
+         *                 message: "Wrong number of segments in token: ..."
+         *             }
+         */
         this.router.post(`${this.path}/google`, validationMiddleware(GoogleAuthDto), this.googleAuth);
+        /**
+         * @swagger
+         * /auth/update-tokens:
+         *   post:
+         *     summary: Update tokens by Refresh token
+         *     requestBody:
+         *       required: true
+         *       description: A JSON object containing the refresh token.
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/definitions/UpdateTokensDto'
+         *           example: {
+         *             "refreshToken": "..."
+         *           }
+         *     security: []
+         *     responses:
+         *       '200':
+         *         description: >
+         *           Successfully authenticated.
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/definitions/AuthResponse'
+         *             example: {
+         *               "token": {
+         *                 "accessToken": "...",
+         *                 "accessTokenExpiresIn": 1576600000000,
+         *                 "refreshToken": "...",
+         *                 "refreshTokenExpiresIn": 1576620000000
+         *               },
+         *               "user": {
+         *                 "_id": "5df91eef0f5bbb0004ba3fff",
+         *                 "name": "",
+         *                 "email": "",
+         *                 "__v": 0
+         *               }
+         *             }
+         *       '401':
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/definitions/BadRequest'
+         *             example: {
+         *                 status: "401",
+         *                 message: "Wrong authentication token"
+         *             }
+         */
         this.router.post(`${this.path}/update-tokens`, validationMiddleware(UpdateTokensDto), this.updateTokens);
     }
 
@@ -178,7 +320,7 @@ class AuthenticationController implements Controller {
 
             response.send(result);
         } catch (e) {
-            next(e)
+            next(new GoogleAuthException(e.message));
         }
     };
 
