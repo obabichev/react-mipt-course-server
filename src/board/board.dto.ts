@@ -5,4 +5,5 @@ class CreateBoardDto {
     public title: string;
 }
 
+
 export default CreateBoardDto;
