@@ -39,10 +39,15 @@ class BoardController implements Controller {
      *       content:
      *         application/json:
      *           schema:
-     *             $ref: '#/definitions/LoginRequest'
+     *             $ref: '#/definitions/CreateBoard'
      *           example: {
-     *                 "title": "",
+     *             "title": "title",
+     *             "key": "TTL",
+     *             "category": {
+     *               "key": "tech",
+     *               "value": "Technology"
      *             }
+     *           }
      *     security: []
      *     responses:
      *       '200':
@@ -53,18 +58,34 @@ class BoardController implements Controller {
      *             schema:
      *               type: object
      *               properties:
-     *                 token:
+     *                 title: string
+     *                 key: string
+     *                 category:
      *                   type: object
      *                   properties:
-     *                     token:
+     *                     key:
      *                       type: string
-     *                     expiresIn:
-     *                       type: number
+     *                     value:
+     *                       type: string
+     *                 owner:
+     *                   type: object
+     *                   properties:
+     *                     _id: string
+     *                     name: string
+     *                     email: string
      *             example: {
-     *                 token: {
-     *                     token: "",
-     *                     expiresIn: ""
-     *                 },
+     *               "_id": "",
+     *               "title": "title",
+     *               "key": "TTL",
+     *               "category": {
+     *                 "key": "tech",
+     *                 "value": "Technology"
+     *               },
+     *               "owner": {
+     *                 "_id": "",
+     *                 "name": "",
+     *                 "email": "",
+     *               },
      *             }
      *       '401':
      *         description: >

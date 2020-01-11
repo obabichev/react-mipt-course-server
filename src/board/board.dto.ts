@@ -2,6 +2,21 @@ import {IsString, Length, ValidateNested} from 'class-validator';
 import DictionaryDto from '../dictionaries/dictionary.dto';
 import {Type} from 'class-transformer';
 
+
+/**
+ * @swagger
+ * definitions:
+ *   CreateBoard:
+ *     title: string
+ *     key: string
+ *     category:
+ *      type: object
+ *      properties:
+ *       key:
+ *         type: string
+ *       value:
+ *         type: string
+ */
 class CreateBoardDto {
     @IsString()
     @Length(2, 255)
