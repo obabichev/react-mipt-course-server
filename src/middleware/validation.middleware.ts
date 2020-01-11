@@ -8,13 +8,28 @@ function validationMiddleware<T>(type: any, skipMissingProperties = false): expr
         validate(plainToClass(type, req.body), {skipMissingProperties})
             .then((errors: ValidationError[]) => {
                 if (errors.length > 0) {
-                    const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-                    next(new HttpException(400, message));
+                    next(new HttpException(400, parseError(errors)));
                 } else {
                     next();
                 }
             });
     };
+}
+
+function parseError(errors: ValidationError[]) {
+    const result = {};
+
+    errors.forEach(error => {
+        if (error.constraints) {
+            result[error.property] = Object.values(error.constraints);
+        }
+
+        if (error.children.length > 0) {
+            result[error.property] = parseError(error.children);
+        }
+    });
+
+    return result;
 }
 
 export default validationMiddleware;

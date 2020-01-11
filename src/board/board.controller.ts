@@ -85,15 +85,28 @@ class BoardController implements Controller {
      */
     createBoard = async (request: RequestWithUser, response: express.Response) => {
         const boardData: CreateBoardDto = request.body;
+        //
+        // const createdPost = new this.board({
+        //     ...boardData,
+        //     owner: request.user._id,
+        //
+        // });
+        // const savedPost = await createdPost.save();
+        // await savedPost.populate('owner', '-password').execPopulate();
+        // response.send(savedPost);
 
-        const createdPost = new this.board({
+        console.log('[obabichev] boardData', boardData);
+
+        const createdBoard = new this.board({
             ...boardData,
             owner: request.user._id,
 
         });
-        const savedPost = await createdPost.save();
-        await savedPost.populate('owner', '-password').execPopulate();
-        response.send(savedPost);
+
+        const savedBoard = await createdBoard.save();
+        await savedBoard.populate('owner', '-password').execPopulate();
+
+        response.send(savedBoard);
     }
 }
 

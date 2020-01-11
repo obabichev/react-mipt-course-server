@@ -6,7 +6,10 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "experimentalDecorators": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "lib": [
+      "es2019"
+    ]
   },
   "include": [
     "src/**/*.ts",
