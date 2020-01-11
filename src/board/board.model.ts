@@ -2,10 +2,34 @@ import * as mongoose from 'mongoose';
 import User from '../user/user.interface';
 import {Dictionary} from '../dictionaries/dictionary.model';
 
+/**
+ * @swagger
+ * definitions:
+ *   Board:
+ *     title: string
+ *     key: string
+ *     owner:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *         _id:
+ *           string
+ *     category:
+ *      type: object
+ *      properties:
+ *       key:
+ *         type: string
+ *       value:
+ *         type: string
+ */
 export interface Board {
     title: string
     key: string
     category: Dictionary
+    owner: User
 }
 
 export const boardSchema = new mongoose.Schema({

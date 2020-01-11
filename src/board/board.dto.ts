@@ -6,7 +6,7 @@ import {Type} from 'class-transformer';
 /**
  * @swagger
  * definitions:
- *   CreateBoard:
+ *   CreateBoardDto:
  *     title: string
  *     key: string
  *     category:

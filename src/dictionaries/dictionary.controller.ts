@@ -3,7 +3,7 @@ import * as express from 'express';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import {Dictionary} from './dictionary.model';
 
-const categories: Dictionary[] = [
+export const categories: Dictionary[] = [
     {
         key: 'tech',
         value: 'Technology'

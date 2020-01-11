@@ -5,6 +5,9 @@ import authMiddleware from '../middleware/auth.middleware';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateBoardDto from './board.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
+import BoardWithTheSameKeyAlreadyExistsException from '../exceptions/BoardWithTheSameKeyAlreadyExistsException';
+import {categories} from '../dictionaries/dictionary.controller';
+import WrongInputException from '../exceptions/WrongInputException';
 
 class BoardController implements Controller {
     public path = '/board';
@@ -22,6 +25,35 @@ class BoardController implements Controller {
             .post(this.path, authMiddleware, validationMiddleware(CreateBoardDto), this.createBoard);
     }
 
+    /**
+     * @swagger
+     * /board:
+     *   get:
+     *     summary: Returns list with all boards
+     *     responses:
+     *       '200':
+     *         description: >
+     *           List of boards.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/definitions/Board'
+     *             example: {
+     *               "_id": "",
+     *               "title": "title",
+     *               "key": "TTL",
+     *               "category": {
+     *                 "key": "tech",
+     *                 "value": "Technology"
+     *               },
+     *               "owner": {
+     *                   "_id": "",
+     *                   "name": "",
+     *                   "email": ""
+     *               }
+     *             }
+     *
+     */
     getAllBoards = async (request: express.Request, response: express.Response) => {
         const boards = await this.board
             .find()
@@ -33,13 +65,13 @@ class BoardController implements Controller {
      * @swagger
      * /board:
      *   post:
-     *     summary: Create new Board
+     *     summary: Create new Board (requires access token)
      *     requestBody:
      *       required: true
      *       content:
      *         application/json:
      *           schema:
-     *             $ref: '#/definitions/CreateBoard'
+     *             $ref: '#/definitions/CreateBoardDto'
      *           example: {
      *             "title": "title",
      *             "key": "TTL",
@@ -104,22 +136,27 @@ class BoardController implements Controller {
      *                 message: "Wrong credentials provided"
      *             }
      */
-    createBoard = async (request: RequestWithUser, response: express.Response) => {
+    createBoard = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
         const boardData: CreateBoardDto = request.body;
-        //
-        // const createdPost = new this.board({
-        //     ...boardData,
-        //     owner: request.user._id,
-        //
-        // });
-        // const savedPost = await createdPost.save();
-        // await savedPost.populate('owner', '-password').execPopulate();
-        // response.send(savedPost);
 
-        console.log('[obabichev] boardData', boardData);
+        const key = boardData.key.toUpperCase();
+
+        const boardByKey = await this.board.findOne({key});
+
+        if (boardByKey) {
+            return next(new BoardWithTheSameKeyAlreadyExistsException(key));
+        }
+
+        const category = categories.find(category => category.key === boardData.category.key);
+
+        if (!category) {
+            return next(new WrongInputException(`Category should belong to the list of available categories`));
+        }
 
         const createdBoard = new this.board({
-            ...boardData,
+            title: boardData.title,
+            key,
+            category,
             owner: request.user._id,
 
         });
