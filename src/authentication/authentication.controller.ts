@@ -37,12 +37,7 @@ import GoogleAuthException from '../exceptions/GoogleAuthException';
  *       refreshTokenExpiresIn:
  *         type: number
  *   AuthResponse:
- *     type: object
- *     properties:
- *       token:
- *         $ref: '#/definitions/Tokens'
- *       user:
- *         $ref: '#/definitions/User'
+ *     $ref: '#/definitions/Tokens'
  *   BadRequest:
  *     type: object
  *     properties:
@@ -90,18 +85,10 @@ class AuthenticationController implements Controller {
          *             schema:
          *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *               "token": {
          *                 "accessToken": "...",
          *                 "accessTokenExpiresIn": 1576600000000,
          *                 "refreshToken": "...",
          *                 "refreshTokenExpiresIn": 1576620000000
-         *               },
-         *               "user": {
-         *                 "_id": "5df91eef0f5bbb0004ba3fff",
-         *                 "name": "",
-         *                 "email": "",
-         *                 "__v": 0
-         *               }
          *             }
          *       '400':
          *         content:
@@ -142,18 +129,10 @@ class AuthenticationController implements Controller {
          *             schema:
          *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *               "token": {
          *                 "accessToken": "...",
          *                 "accessTokenExpiresIn": 1576600000000,
          *                 "refreshToken": "...",
          *                 "refreshTokenExpiresIn": 1576620000000
-         *               },
-         *               "user": {
-         *                 "_id": "5df91eef0f5bbb0004ba3fff",
-         *                 "name": "",
-         *                 "email": "",
-         *                 "__v": 0
-         *               }
          *             }
          *       '401':
          *         description: >
@@ -194,18 +173,10 @@ class AuthenticationController implements Controller {
          *             schema:
          *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *               "token": {
          *                 "accessToken": "...",
          *                 "accessTokenExpiresIn": 1576600000000,
          *                 "refreshToken": "...",
          *                 "refreshTokenExpiresIn": 1576620000000
-         *               },
-         *               "user": {
-         *                 "_id": "5df91eef0f5bbb0004ba3fff",
-         *                 "name": "",
-         *                 "email": "",
-         *                 "__v": 0
-         *               }
          *             }
          *       '400':
          *         content:
@@ -243,18 +214,10 @@ class AuthenticationController implements Controller {
          *             schema:
          *               $ref: '#/definitions/AuthResponse'
          *             example: {
-         *               "token": {
          *                 "accessToken": "...",
          *                 "accessTokenExpiresIn": 1576600000000,
          *                 "refreshToken": "...",
          *                 "refreshTokenExpiresIn": 1576620000000
-         *               },
-         *               "user": {
-         *                 "_id": "5df91eef0f5bbb0004ba3fff",
-         *                 "name": "",
-         *                 "email": "",
-         *                 "__v": 0
-         *               }
          *             }
          *       '401':
          *         content:
@@ -272,14 +235,8 @@ class AuthenticationController implements Controller {
     private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const userData: CreateUserDto = request.body;
         try {
-            const {
-                token,
-                user,
-            } = await this.authenticationService.register(userData);
-            response.send({
-                token,
-                user
-            });
+            const {token} = await this.authenticationService.register(userData);
+            response.send(token);
         } catch (error) {
             next(error);
         }
@@ -293,10 +250,7 @@ class AuthenticationController implements Controller {
             if (isPasswordMatching) {
                 user.password = undefined;
                 const token = this.authenticationService.createToken(user);
-                response.send({
-                    token,
-                    user
-                });
+                response.send(token);
             } else {
                 next(new WrongCredentialsException());
             }
@@ -318,7 +272,7 @@ class AuthenticationController implements Controller {
 
             const result = await this.authenticationService.oauthLoginOrRegistration(user, 'google');
 
-            response.send(result);
+            response.send(result.token);
         } catch (e) {
             next(new GoogleAuthException(e.message));
         }
