@@ -6,7 +6,7 @@ import validationMiddleware from '../middleware/validation.middleware';
 import CreateBoardDto from './board.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import BoardWithTheSameKeyAlreadyExistsException from '../exceptions/BoardWithTheSameKeyAlreadyExistsException';
-import {categories} from '../dictionaries/dictionary.controller';
+import {boardIcons, categories} from '../dictionaries/dictionary.controller';
 import WrongInputException from '../exceptions/WrongInputException';
 
 class BoardController implements Controller {
@@ -46,6 +46,10 @@ class BoardController implements Controller {
      *                 "key": "tech",
      *                 "value": "Technology"
      *               },
+     *               "icon": {
+     *                 "key": "1",
+     *                 "value": "..."
+     *               },
      *               "owner": {
      *                   "_id": "",
      *                   "name": "",
@@ -78,6 +82,10 @@ class BoardController implements Controller {
      *             "category": {
      *               "key": "tech",
      *               "value": "Technology"
+     *             },
+     *             "icon": {
+     *               "key": "1",
+     *               "value": "..."
      *             }
      *           }
      *     security: []
@@ -113,6 +121,10 @@ class BoardController implements Controller {
      *                 "key": "tech",
      *                 "value": "Technology"
      *               },
+     *               "icon": {
+     *                 "key": "1",
+     *                 "value": "..."
+     *               },
      *               "owner": {
      *                 "_id": "",
      *                 "name": "",
@@ -147,18 +159,22 @@ class BoardController implements Controller {
             return next(new BoardWithTheSameKeyAlreadyExistsException(key));
         }
 
-        const category = categories.find(category => category.key === boardData.category.key);
-
+        const category = boardData?.category?.key && categories.find(category => category.key === boardData.category.key);
         if (!category) {
             return next(new WrongInputException(`Category should belong to the list of available categories`));
+        }
+
+        const icon = boardData?.icon?.key && boardIcons.find(icon => icon.key === boardData.icon.key);
+        if (!icon) {
+            return next(new WrongInputException(`Board icon should belong to the list of available board icons`));
         }
 
         const createdBoard = new this.board({
             title: boardData.title,
             key,
             category,
+            icon,
             owner: request.user._id,
-
         });
 
         const savedBoard = await createdBoard.save();

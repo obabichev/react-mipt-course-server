@@ -16,6 +16,13 @@ import {Type} from 'class-transformer';
  *         type: string
  *       value:
  *         type: string
+ *     icon:
+ *      type: object
+ *      properties:
+ *       key:
+ *         type: string
+ *       value:
+ *         type: string
  */
 class CreateBoardDto {
     @IsString()
@@ -29,6 +36,10 @@ class CreateBoardDto {
     @ValidateNested()
     @Type(() => DictionaryDto)
     public category: DictionaryDto;
+
+    @ValidateNested()
+    @Type(() => DictionaryDto)
+    public icon: DictionaryDto;
 }
 
 
