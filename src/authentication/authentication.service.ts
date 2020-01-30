@@ -32,8 +32,8 @@ class AuthenticationService {
 
     public createToken(user: { _id: string }): TokenData {
         const now = Date.now();
-        const accessTokenExpiresIn = 60 * 60; // an hour
-        const refreshTokenExpiresIn = 60 * 60 * 24 * 30 * 6; // about half year
+        const accessTokenExpiresIn = 60 * 60 * 1000; // an hour
+        const refreshTokenExpiresIn = 60 * 60 * 24 * 30 * 6 * 1000; // about half year
         const secret = process.env.JWT_SECRET;
         const refreshSecret = process.env.JWT_REFRESH_SECRET;
 
