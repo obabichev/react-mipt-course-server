@@ -28,10 +28,10 @@ class AuthenticationService {
             token,
             user,
         };
-
     }
 
     public createToken(user: { _id: string }): TokenData {
+
         const now = Date.now();
         const accessTokenExpiresIn = 60 * 60 * 1000; // an hour
         const refreshTokenExpiresIn = 60 * 60 * 24 * 30 * 6 * 1000; // about half year
