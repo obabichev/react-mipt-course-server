@@ -28,6 +28,7 @@ class AuthenticationService {
             token,
             user,
         };
+
     }
 
     public createToken(user: { _id: string }): TokenData {
