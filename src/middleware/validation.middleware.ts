@@ -24,7 +24,7 @@ function parseError(errors: ValidationError[]) {
             result[error.property] = Object.values(error.constraints);
         }
 
-        if (error.children.length > 0) {
+        if (error.children && error.children.length > 0) {
             result[error.property] = parseError(error.children);
         }
     });

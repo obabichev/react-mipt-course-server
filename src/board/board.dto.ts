@@ -1,6 +1,7 @@
-import {IsString, Length, ValidateNested} from 'class-validator';
+import {IsString, Length, Validate, ValidateNested} from 'class-validator';
 import DictionaryDto from '../dictionaries/dictionary.dto';
 import {Type} from 'class-transformer';
+import {UniqueBoardKeyValidation} from './board.validation';
 
 
 /**
@@ -31,6 +32,7 @@ class CreateBoardDto {
 
     @IsString()
     @Length(2, 5)
+    @Validate(UniqueBoardKeyValidation)
     public key: string;
 
     @ValidateNested()

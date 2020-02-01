@@ -153,12 +153,6 @@ class BoardController implements Controller {
 
         const key = boardData.key.toUpperCase();
 
-        const boardByKey = await this.board.findOne({key});
-
-        if (boardByKey) {
-            return next(new BoardWithTheSameKeyAlreadyExistsException(key));
-        }
-
         const category = boardData?.category?.key && categories.find(category => category.key === boardData.category.key);
         if (!category) {
             return next(new WrongInputException(`Category should belong to the list of available categories`));
