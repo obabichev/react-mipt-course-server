@@ -5,7 +5,6 @@ import authMiddleware from '../middleware/auth.middleware';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateBoardDto from './board.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
-import BoardWithTheSameKeyAlreadyExistsException from '../exceptions/BoardWithTheSameKeyAlreadyExistsException';
 import {boardIcons, categories} from '../dictionaries/dictionary.controller';
 import WrongInputException from '../exceptions/WrongInputException';
 

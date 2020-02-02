@@ -40,7 +40,7 @@ export interface Board {
     owner: User
 }
 
-export const boardSchema = new mongoose.Schema({
+const boardSchema = new mongoose.Schema({
     title: String,
     owner: {
         ref: 'User',
