@@ -38,7 +38,7 @@ class TasksController implements Controller {
     };
 
     private createTask = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
-        const {title, boardId, description}: CreateTaskDto = request.body;
+        const {title, boardId, description, parentTaskId}: CreateTaskDto = request.body;
 
         let board;
 
@@ -55,7 +55,7 @@ class TasksController implements Controller {
 
         const key = `${board.key}-${number}`;
 
-        const createdTask = new this.task({
+        const body: Partial<Task> = {
             title,
             description,
             key,
@@ -65,10 +65,39 @@ class TasksController implements Controller {
             status: 'BACKLOG',
             estimation: 0,
             assignee: null
-        });
+        };
+
+        if (parentTaskId) {
+            let parent: Task;
+            try {
+                parent = await this.task.findById(parentTaskId);
+            } catch (e) {
+                return next(new HttpException(500, e.message));
+            }
+            if (!parent) {
+                return next(new HttpException(400, 'Parent task was not found'));
+            }
+            // @ts-ignore
+            if (!parent.board.equals(board._id)) {
+                return next(new HttpException(400, 'Parent task and new task should belong to the same board'));
+            }
+            body.parent = parent._id;
+        }
+
+        const createdTask = new this.task(body);
 
         const savedTask = await createdTask.save();
-        await savedTask.populate('owner', '-password').execPopulate();
+
+        if (parentTaskId) {
+            await this.task.findByIdAndUpdate(
+                parentTaskId,
+                {$push: {subtasks: savedTask._id}},
+                {new: true, useFindAndModify: false}
+            )
+        }
+        await savedTask
+            .populate('owner', '-password')
+            .execPopulate();
 
         response.send(savedTask);
     };

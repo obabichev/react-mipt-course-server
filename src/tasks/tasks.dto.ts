@@ -17,6 +17,10 @@ export class CreateTaskDto {
 
     @IsString()
     public description: string;
+
+    @IsOptional()
+    @IsString()
+    public parentTaskId: string;
 }
 
 export class UpdateTaskDto {

@@ -12,8 +12,9 @@ export interface Task {
     status: String,
     estimation: number,
     assignee: User | string,
-    board: Board | string,
-    owner: User | string
+    board: Board,
+    owner: User | string,
+    parent?: Task | string,
 }
 
 const tasksSchema = new mongoose.Schema({
@@ -39,6 +40,10 @@ const tasksSchema = new mongoose.Schema({
         ref: 'Board',
         type: mongoose.Schema.Types.ObjectId,
     },
+    parent: {
+        ref: 'Task',
+        type: mongoose.Schema.Types.ObjectId,
+    }
 });
 
 export const tasksModel = mongoose.model<Task & mongoose.Document>('Task', tasksSchema);
