@@ -97,21 +97,22 @@ class TasksController implements Controller {
 
     private updateTask = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const id = request.params.id;
-        const {title, description, status}: UpdateTaskDto = request.body;
+        const {title, description, status, estimation}: UpdateTaskDto = request.body;
 
         const original = await this.task.findById(id);
         if (!original) {
             next(new WrongInputException(`Task with id ${id} was not found`));
         }
 
-        const patch: Partial<Task> = {
-            _id: id
-        };
+        const patch: Partial<Task> = {};
         if (title) {
             patch.title = title;
         }
         if (description) {
             patch.description = description;
+        }
+        if (estimation) {
+            patch.estimation = estimation;
         }
 
         if (status) {
@@ -123,7 +124,7 @@ class TasksController implements Controller {
         }
 
         try {
-            await this.task.update(patch);
+            await this.task.updateOne({_id: id}, patch);
             const result = await this.task.findById(id);
             response.send(result);
         } catch (e) {

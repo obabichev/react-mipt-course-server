@@ -1,4 +1,4 @@
-import {IsString, Length} from 'class-validator';
+import {IsInt, IsOptional, IsPositive, IsString, Length} from 'class-validator';
 
 /**
  * @swagger
@@ -20,9 +20,20 @@ export class CreateTaskDto {
 }
 
 export class UpdateTaskDto {
+    @IsOptional()
+    @IsString()
     public title: string;
 
+    @IsOptional()
+    @IsString()
     public description: string;
 
+    @IsOptional()
+    @IsString()
     public status: string;
+
+    @IsOptional()
+    @IsInt()
+    @IsPositive()
+    public estimation: number;
 }
