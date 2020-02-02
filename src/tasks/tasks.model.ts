@@ -1,8 +1,19 @@
 import * as mongoose from 'mongoose';
 import User from '../user/user.interface';
+import {Board} from '../board/board.model';
 
 export interface Task {
-    owner: User
+    _id: string;
+    title: string;
+    description: string,
+    key: string,
+    subtasks: Task[],
+    comments: any[],
+    status: String,
+    estimation: number,
+    assignee: User | string,
+    board: Board | string,
+    owner: User | string
 }
 
 const tasksSchema = new mongoose.Schema({

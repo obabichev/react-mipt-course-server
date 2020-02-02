@@ -18,3 +18,11 @@ export class CreateTaskDto {
     @IsString()
     public description: string;
 }
+
+export class UpdateTaskDto {
+    public title: string;
+
+    public description: string;
+
+    public status: string;
+}

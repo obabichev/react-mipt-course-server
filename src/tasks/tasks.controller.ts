@@ -1,9 +1,9 @@
 import Controller from '../interfaces/controller.interface';
 import * as express from 'express';
-import {tasksModel} from './tasks.model';
+import {Task, tasksModel} from './tasks.model';
 import authMiddleware from '../middleware/auth.middleware';
 import validationMiddleware from '../middleware/validation.middleware';
-import {CreateTaskDto} from './tasks.dto';
+import {CreateTaskDto, UpdateTaskDto} from './tasks.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import {boardModel} from '../board/board.model';
 import WrongInputException from '../exceptions/WrongInputException';
@@ -26,7 +26,8 @@ class TasksController implements Controller {
         this.router.get(`${this.path}/:key`, this.getTaskByKeyOrId);
         this.router
             .all(`${this.path}/*`, authMiddleware)
-            .post(this.path, authMiddleware, validationMiddleware(CreateTaskDto), this.createTask);
+            .post(this.path, authMiddleware, validationMiddleware(CreateTaskDto), this.createTask)
+            .put(`${this.path}/:id`, authMiddleware, validationMiddleware(UpdateTaskDto), this.updateTask)
     }
 
     private getAllTasks = async (request: express.Request, response: express.Response) => {
@@ -92,6 +93,42 @@ class TasksController implements Controller {
         }
 
         return next(new HttpException(400, 'Task was not found'));
+    };
+
+    private updateTask = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        const id = request.params.id;
+        const {title, description, status}: UpdateTaskDto = request.body;
+
+        const original = await this.task.findById(id);
+        if (!original) {
+            next(new WrongInputException(`Task with id ${id} was not found`));
+        }
+
+        const patch: Partial<Task> = {
+            _id: id
+        };
+        if (title) {
+            patch.title = title;
+        }
+        if (description) {
+            patch.description = description;
+        }
+
+        if (status) {
+            if (statuses.indexOf(status) !== -1 && (original.status === status || original.status !== 'DONE' && original.status !== 'CLOSED')) {
+                patch.status = status;
+            } else {
+                return next(new WrongInputException('Status should be BACKLOG, TODO, IN_PROGRESS, DONE or CLOSED. Also status of closed and done tasks may not be changed'));
+            }
+        }
+
+        try {
+            await this.task.update(patch);
+            const result = await this.task.findById(id);
+            response.send(result);
+        } catch (e) {
+            next(new HttpException(500, e.message));
+        }
     }
 }
 
