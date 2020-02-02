@@ -7,7 +7,6 @@ function validationMiddleware<T>(type: any, skipMissingProperties = false): expr
     return (req, res, next) => {
         validate(plainToClass(type, req.body), {skipMissingProperties})
             .then((errors: ValidationError[]) => {
-                console.log('[obabichev] error', errors);
                 if (errors.length > 0) {
                     next(new ValidationException(parseError(errors)));
                 } else {
