@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import User from '../user/user.interface';
 import {Dictionary} from '../dictionaries/dictionary.model';
+import {Task} from '../tasks/tasks.model';
 
 /**
  * @swagger
@@ -38,6 +39,7 @@ export interface Board {
     category: Dictionary
     icon: Dictionary
     owner: User
+    tasks: Task[]
 }
 
 const boardSchema = new mongoose.Schema({
@@ -54,7 +56,11 @@ const boardSchema = new mongoose.Schema({
     icon: {
         key: String,
         value: String
-    }
+    },
+    tasks: [{
+        ref: 'Task',
+        type: mongoose.Schema.Types.ObjectId,
+    }],
 });
 
 export const boardModel = mongoose.model<Board & mongoose.Document>('Board', boardSchema);

@@ -7,6 +7,7 @@ import CreateBoardDto from './board.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import {boardIcons, categories} from '../dictionaries/dictionary.controller';
 import WrongInputException from '../exceptions/WrongInputException';
+import HttpException from '../exceptions/HttpException';
 
 class BoardController implements Controller {
     public path = '/board';
@@ -19,6 +20,7 @@ class BoardController implements Controller {
 
     private initializeRoutes() {
         this.router.get(this.path, this.getAllBoards);
+        this.router.get(`${this.path}/:id`, this.getBoardById);
         this.router
             .all(`${this.path}/*`, authMiddleware)
             .post(this.path, authMiddleware, validationMiddleware(CreateBoardDto), this.createBoard);
@@ -62,6 +64,17 @@ class BoardController implements Controller {
             .find()
             .populate('owner', '-password');
         response.send(boards);
+    };
+
+    getBoardById = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
+        const id = request.params.id;
+        try {
+            const board = await this.board.findById(id)
+                .populate('tasks');
+            response.send(board);
+        } catch (e) {
+            return next(new HttpException(500, e.message));
+        }
     };
 
     /**

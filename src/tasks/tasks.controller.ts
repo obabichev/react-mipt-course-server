@@ -93,8 +93,13 @@ class TasksController implements Controller {
                 parentTaskId,
                 {$push: {subtasks: savedTask._id}},
                 {new: true, useFindAndModify: false}
-            )
+            );
         }
+        await this.board.findByIdAndUpdate(
+            board._id,
+            {$push: {tasks: savedTask._id}},
+            {new: true, useFindAndModify: false}
+        );
         await savedTask
             .populate('owner', '-password')
             .execPopulate();
