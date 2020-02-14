@@ -100,11 +100,10 @@ class TasksController implements Controller {
             {$push: {tasks: savedTask._id}},
             {new: true, useFindAndModify: false}
         );
-        await savedTask
-            .populate('owner', '-password')
-            .execPopulate();
 
-        response.send(savedTask);
+        const _board = await this.board.findById(board._id)
+            .populate('tasks');
+        response.send(_board);
     };
 
     private getTaskByKeyOrId = async (request: express.Request, response: express.Response, next: express.NextFunction) => {

@@ -67,14 +67,27 @@ class BoardController implements Controller {
     };
 
     getBoardById = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
-        const id = request.params.id;
+        const key = request.params.id;
         try {
-            const board = await this.board.findById(id)
+            const board = await this.board.findById(key)
+                .populate('owner', '-password')
                 .populate('tasks');
-            response.send(board);
+            if (board) {
+                return response.send(board);
+            }
         } catch (e) {
-            return next(new HttpException(500, e.message));
         }
+        try {
+            const board = await this.board.findOne({key})
+                .populate('owner', '-password')
+                .populate('tasks');
+            if (board) {
+                return response.send(board);
+            }
+        } catch (e) {
+        }
+
+        return next(new HttpException(400, 'Board was not found'));
     };
 
     /**
