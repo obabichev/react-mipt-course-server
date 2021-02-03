@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import 'dotenv/config';
+// import 'dotenv/config';
 import App from './src/app';
 import AuthenticationController from './src/authentication/authentication.controller';
 import BoardController from './src/board/board.controller';

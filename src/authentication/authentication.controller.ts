@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt-nodejs';
 import * as express from 'express';
 import WrongCredentialsException from '../exceptions/WrongCredentialsException';
 import Controller from '../interfaces/controller.interface';
@@ -10,7 +10,7 @@ import {GoogleAuthDto, LogInDto, UpdateTokensDto} from './authentication.dto';
 import * as jwt from 'jsonwebtoken';
 import DataStoredInToken from '../interfaces/dataStoredInToken';
 import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
-import {getGoogleAccountFromCode} from '../../utils/google';
+import {getGoogleAccountFromCode} from '../utils/google';
 import GoogleAuthException from '../exceptions/GoogleAuthException';
 
 /**

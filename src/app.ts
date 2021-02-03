@@ -61,7 +61,7 @@ class App {
                 MONGO_PASSWORD,
                 MONGO_PATH,
             } = process.env;
-            uri = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}${MONGO_PATH}`;
+            uri = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_PATH}`;
         }
 
         mongoose.connect(uri, {
