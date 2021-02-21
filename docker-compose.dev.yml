@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: .
+      target: dev
+    restart: always
+    depends_on:
+      - database
+    environment:
+      MONGO_USER: root
+      MONGO_PASSWORD: rootpassword
+      MONGO_PATH: database:27017/mini-jira?authSource=admin
+      PORT: 5000
+      JWT_SECRET: test1
+      JWT_REFRESH_SECRET: test2
+      GOOGLE_AUTH_CLIENT_ID: 416520824005-i7rgnt5fcm7rd12av7p7h70ndvnmjodp.apps.googleusercontent.com
+      GOOGLE_AUTH_CLIENT_SECRET:
+      GOOGLE_AUTH_REDIRECT_URL:
+    ports:
+      - 5000:5000
+    volumes:
+      - ./src:/app/src
+      - ./server.ts:/app/server.ts
+  database:
+    image: mongo:4.2.2
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:

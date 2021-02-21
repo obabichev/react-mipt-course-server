@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt-nodejs';
+import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import UserWithThatEmailAlreadyExistsException from '../exceptions/UserWithThatEmailAlreadyExistsException';
 import DataStoredInToken from '../interfaces/dataStoredInToken';
@@ -11,13 +11,25 @@ import UserWasAlreadyRegisteredWithOtherServiceException
 class AuthenticationService {
     public user = userModel;
 
+    private async hashPassword(password: string): Promise<string> {
+        return new Promise(((resolve, reject) => {
+            bcrypt.hash(password, 10, function (err, hash) {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(hash);
+            })
+        }))
+    }
+
+
     public async register(userData: CreateUserDto) {
         if (
             await this.user.findOne({email: userData.email})
         ) {
             throw new UserWithThatEmailAlreadyExistsException(userData.email);
         }
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const hashedPassword = await this.hashPassword(userData.password);
         const user = await this.user.create({
             ...userData,
             password: hashedPassword,

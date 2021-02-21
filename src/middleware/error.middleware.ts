@@ -15,6 +15,8 @@ function errorMiddleware(error: HttpException | ValidationException, request: Re
         payload.validation = error.validation;
     }
 
+    console.log(`${status} ${request.method} ${request.path}`, error);
+
     response
         .status(status)
         .send(payload)
