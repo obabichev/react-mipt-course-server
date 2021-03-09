@@ -31,6 +31,19 @@ class BoardController implements Controller {
      * /board:
      *   get:
      *     summary: Returns list with all boards
+     *     parameters:
+     *       - name: limit
+     *         in: query
+     *         schema:
+     *           type: integer
+     *         required: false
+     *         default: 25
+     *       - name: offset
+     *         in: query
+     *         schema:
+     *           type: integer
+     *         required: false
+     *         default: 0
      *     responses:
      *       '200':
      *         description: >
@@ -60,9 +73,14 @@ class BoardController implements Controller {
      *
      */
     getAllBoards = async (request: express.Request, response: express.Response) => {
+        const {limit, offset} = request.query;
+
         const boards = await this.board
             .find()
-            .populate('owner', '-password');
+            .populate('owner', '-password  -oauth')
+            .sort("title")
+            .skip(Number.parseInt(offset) || 0)
+            .limit(Number.parseInt(limit) || 25);
         response.send(boards);
     };
 
@@ -72,6 +90,7 @@ class BoardController implements Controller {
             const board = await this.board.findById(key)
                 .populate('owner', '-password')
                 .populate('tasks');
+
             if (board) {
                 return response.send(board);
             }
