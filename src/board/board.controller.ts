@@ -84,6 +84,45 @@ class BoardController implements Controller {
         response.send(boards);
     };
 
+    /**
+     * @swagger
+     * /api/board/{id}:
+     *   get:
+     *     summary: Returns list with all boards
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         schema:
+     *           type: string
+     *         required: true
+     *     responses:
+     *       '200':
+     *         description: >
+     *           Details of board.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/definitions/Board'
+     *             example: {
+     *               "_id": "",
+     *               "title": "title",
+     *               "key": "TTL",
+     *               "category": {
+     *                 "key": "tech",
+     *                 "value": "Technology"
+     *               },
+     *               "icon": {
+     *                 "key": "1",
+     *                 "value": "..."
+     *               },
+     *               "owner": {
+     *                   "_id": "",
+     *                   "name": "",
+     *                   "email": ""
+     *               }
+     *             }
+     *
+     */
     getBoardById = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
         const key = request.params.id;
         try {

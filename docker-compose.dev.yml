@@ -23,6 +23,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./server.ts:/app/server.ts
+      - ./swagger.ts:/app/swagger.ts
   database:
     image: mongo:4.2.2
     restart: always
