@@ -60,7 +60,7 @@ class AuthenticationController implements Controller {
     private initializeRoutes() {
         /**
          * @swagger
-         * /auth/register:
+         * /api/auth/register:
          *   post:
          *     summary: Create new User
          *     requestBody:
@@ -105,7 +105,7 @@ class AuthenticationController implements Controller {
         this.router.post(`${this.path}/register`, validationMiddleware(CreateUserDto), this.registration);
         /**
          * @swagger
-         * /auth/login:
+         * /api/auth/login:
          *   post:
          *     summary: Log in and return auth token
          *     requestBody:
@@ -150,7 +150,7 @@ class AuthenticationController implements Controller {
         this.router.post(`${this.path}/logout`, this.loggingOut);
         /**
          * @swagger
-         * /auth/google:
+         * /api/auth/google:
          *   post:
          *     summary: Login with Google id_token
          *     requestBody:
@@ -191,7 +191,7 @@ class AuthenticationController implements Controller {
         this.router.post(`${this.path}/google`, validationMiddleware(GoogleAuthDto), this.googleAuth);
         /**
          * @swagger
-         * /auth/update-tokens:
+         * /api/auth/update-tokens:
          *   post:
          *     summary: Update tokens by Refresh token
          *     requestBody:

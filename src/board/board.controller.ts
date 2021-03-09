@@ -28,7 +28,7 @@ class BoardController implements Controller {
 
     /**
      * @swagger
-     * /board:
+     * /api/board:
      *   get:
      *     summary: Returns list with all boards
      *     parameters:
@@ -111,7 +111,7 @@ class BoardController implements Controller {
 
     /**
      * @swagger
-     * /board:
+     * /api/board:
      *   post:
      *     summary: Create new Board (requires access token)
      *     requestBody:

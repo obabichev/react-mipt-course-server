@@ -132,7 +132,7 @@ class DictionaryController implements Controller {
 
     /**
      * @swagger
-     * /dictionaries/categories:
+     * /api/dictionaries/categories:
      *   get:
      *     summary: Returns categories for Boards
      *     responses:
@@ -162,7 +162,7 @@ class DictionaryController implements Controller {
 
     /**
      * @swagger
-     * /dictionaries/board-icons:
+     * /api/dictionaries/board-icons:
      *   get:
      *     summary: Returns List of urls to Board icons
      *     responses:
