@@ -12,6 +12,9 @@ import DataStoredInToken from '../interfaces/dataStoredInToken';
 import WrongAuthenticationTokenException from '../exceptions/WrongAuthenticationTokenException';
 import {getGoogleAccountFromCode} from '../utils/google';
 import GoogleAuthException from '../exceptions/GoogleAuthException';
+import authMiddleware from '../middleware/auth.middleware';
+import RequestWithUser from '../interfaces/requestWithUser.interface';
+import WrongInputException from '../exceptions/WrongInputException';
 
 /**
  * @swagger
@@ -230,6 +233,25 @@ class AuthenticationController implements Controller {
          *             }
          */
         this.router.post(`${this.path}/update-tokens`, validationMiddleware(UpdateTokensDto), this.updateTokens);
+        /**
+         * @swagger
+         * /api/auth/profile:
+         *   get:
+         *     summary: Returns the information about authenticated user
+         *     security: []
+         *     responses:
+         *       '200':
+         *         description: >
+         *           Current user.
+         *         content:
+         *           application/json:
+         *             example: {
+         *               "_id": "",
+         *               "name": "test-user",
+         *               "email": "test-user@gmail.com",
+         *             }
+         */
+        this.router.get(`${this.path}/profile`, authMiddleware, this.getProfile);
     }
 
     private registration = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -292,6 +314,19 @@ class AuthenticationController implements Controller {
             response.send(tokens);
         } catch (error) {
             next(new WrongAuthenticationTokenException());
+        }
+    }
+
+    private getProfile = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
+        const userId = request.user._id;
+        try {
+            const user = await this.user.findOne(userId)
+                .populate('-password')
+                .lean();
+            response.send({...user, password: undefined});
+        } catch (error) {
+            console.error(error);
+            next(new WrongInputException("User not found"));
         }
     }
 }
