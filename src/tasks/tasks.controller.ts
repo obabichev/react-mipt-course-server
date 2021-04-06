@@ -36,7 +36,25 @@ class TasksController implements Controller {
             .populate('owner', '-password');
         response.send(tasks);
     };
-
+    /**
+     * @swagger
+     * /api/task:
+     *   post:
+     *     summary: Create new Task (requires access token)
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/definitions/CreateTaskDto'
+     *           example: {
+     *             "title": "title",
+     *             "boardId": "boardId",
+     *             "description": "description",
+     *             "parentTaskId": ""
+     *           }
+     *     security: []
+     */
     private createTask = async (request: RequestWithUser, response: express.Response, next: express.NextFunction) => {
         const {title, boardId, description, parentTaskId}: CreateTaskDto = request.body;
 

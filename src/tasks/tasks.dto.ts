@@ -6,6 +6,8 @@ import {IsInt, IsOptional, IsPositive, IsString, Length} from 'class-validator';
  *   CreateTaskDto:
  *     title: string
  *     boardId: string
+ *     description: string
+ *     parentTaskId: string
  */
 export class CreateTaskDto {
     @IsString()
